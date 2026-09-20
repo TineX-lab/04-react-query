@@ -1,5 +1,6 @@
-import { useState, type ComponentType } from "react";
+import { useState, useEffect, type ComponentType } from "react";
 import { useQuery, keepPreviousData } from "@tanstack/react-query";
+import toast, { Toaster } from "react-hot-toast";
 import { fetchMovies } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 
@@ -26,12 +27,18 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError, error } = useQuery({
+  const { data, isLoading, isFetching, isError, error, isSuccess } = useQuery({
     queryKey: ["movies", searchQuery, page],
     queryFn: () => fetchMovies(searchQuery, page),
     enabled: !!searchQuery,
     placeholderData: keepPreviousData,
   });
+
+  useEffect(() => {
+    if (isSuccess && data?.results.length === 0) {
+      toast.error("No movies found for your request.");
+    }
+  }, [isSuccess, data]);
 
   const handleSearch = (newQuery: string) => {
     if (newQuery === searchQuery) return;
@@ -40,16 +47,19 @@ export default function App() {
   };
 
   const totalPages = data?.total_pages || 0;
+  const isSpinnerShowing = isLoading || isFetching;
 
   return (
     <div className={css.container}>
+      <Toaster position="top-right" />
+
       <SearchBar onSubmit={handleSearch} />
 
       <main className={css.main}>
-        {isLoading && <Loader />}
+        {isSpinnerShowing && <Loader />}
         {isError && <ErrorMessage message={error.message} />}
 
-        {data && data.results.length > 0 && (
+        {isSuccess && data && data.results.length > 0 && (
           <>
             {totalPages > 1 && (
               <ReactPaginate
@@ -67,12 +77,6 @@ export default function App() {
 
             <MovieGrid movies={data.results} onSelect={setSelectedMovie} />
           </>
-        )}
-
-        {data && data.results.length === 0 && !isLoading && (
-          <div className={css.noResults}>
-            <span>❌ No movies found for your request.</span>
-          </div>
         )}
       </main>
 

@@ -34,6 +34,15 @@ export default function MovieModal({ movie, onClose }: MovieModalProps) {
   const modalContent = (
     <div className={css.overlay} onClick={handleBackdropClick}>
       <div className={css.modal}>
+        <button
+          type="button"
+          className={css.closeBtn}
+          onClick={onClose}
+          aria-label="Close modal"
+        >
+          &times;
+        </button>
+
         <img
           src={
             movie.backdrop_path
