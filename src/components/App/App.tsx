@@ -1,5 +1,5 @@
 import { useState, type ComponentType } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import { fetchMovies } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 
@@ -30,6 +30,7 @@ export default function App() {
     queryKey: ["movies", searchQuery, page],
     queryFn: () => fetchMovies(searchQuery, page),
     enabled: !!searchQuery,
+    placeholderData: keepPreviousData,
   });
 
   const handleSearch = (newQuery: string) => {
@@ -64,10 +65,7 @@ export default function App() {
               />
             )}
 
-            <MovieGrid
-              movies={data.results}
-              onSelect={(movie) => setSelectedMovie(movie)}
-            />
+            <MovieGrid movies={data.results} onSelect={setSelectedMovie} />
           </>
         )}
 

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { createPortal } from "react-dom";
 import type { Movie } from "../../types/movie";
 import css from "./MovieModal.module.css";
 
@@ -8,49 +9,47 @@ interface MovieModalProps {
 }
 
 export default function MovieModal({ movie, onClose }: MovieModalProps) {
-  const defaultImg =
-    "https://dl-pro.com/wp-content/uploads/2021/04/default-image.png";
-
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+      if (e.key === "Escape") {
+        onClose();
+      }
     };
+
+    document.body.style.overflow = "hidden";
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = "auto";
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [onClose]);
 
-  return (
-    <div className={css.backdrop} onClick={onClose}>
-      <div className={css.modal} onClick={(e) => e.stopPropagation()}>
-        <button className={css.closeBtn} onClick={onClose}>
-          ✕
-        </button>
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
+
+  const modalContent = (
+    <div className={css.overlay} onClick={handleBackdropClick}>
+      <div className={css.modal}>
         <img
           src={
-            movie.poster_path
-              ? `https://image.tmdb.org/t/p/w500/${movie.poster_path}`
-              : defaultImg
+            movie.backdrop_path
+              ? `https://image.tmdb.org/t/p/w500${movie.backdrop_path}`
+              : "https://via.placeholder.com/500x281?text=No+Image"
           }
           alt={movie.title}
           className={css.image}
         />
-        <div className={css.content}>
-          <h2 className={css.title}>{movie.title}</h2>
-          <p className={css.overview}>
-            {movie.overview || "No description available."}
-          </p>
-          {movie.release_date && (
-            <p>
-              <strong>Release Date:</strong> {movie.release_date}
-            </p>
-          )}
-          {movie.vote_average && (
-            <p>
-              <strong>Rating:</strong> {movie.vote_average} / 10
-            </p>
-          )}
+        <div className={css.info}>
+          <h2>{movie.title}</h2>
+          <p>{movie.overview}</p>
         </div>
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
