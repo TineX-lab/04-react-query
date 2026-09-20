@@ -1,0 +1,31 @@
+.card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  background-color: #1f2937;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+.info {
+  padding: 12px;
+}
+
+.title {
+  margin: 0;
+  font-size: 15px;
+  color: #fff;
+}
