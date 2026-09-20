@@ -1,6 +1,6 @@
 import { useState, type ComponentType } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { fetchMovies } from "../../api/tmdb";
+import { fetchMovies } from "../../service/tmdb";
 import type { Movie } from "../../types/movie";
 
 import SearchBar from "../SearchBar/SearchBar";
